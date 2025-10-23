@@ -1,27 +1,38 @@
 import { NextRequest } from "next/server";
-import { ApolloServer } from "@apollo/server";
-import { startServerAndCreateNextHandler } from "@as-integrations/next";
 import { schema } from "@/graphql/schema";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-//  Apollo Server instance
-const server = new ApolloServer({
-  schema,
-});
+let handler: any = null;
 
-const handler = startServerAndCreateNextHandler<NextRequest>(server, {
-  context: async (req) => ({
-    req,
-    headers: Object.fromEntries(req.headers),
-  }),
-});
+async function getApolloHandler() {
+  if (!handler) {
+    const { ApolloServer } = await import("@apollo/server");
+    const { startServerAndCreateNextHandler } = await import(
+      "@as-integrations/next"
+    );
 
-export async function GET(req: NextRequest) {
-  return handler(req);
+    const server = new ApolloServer({
+      schema,
+    });
+
+    handler = startServerAndCreateNextHandler<NextRequest>(server, {
+      context: async (req) => ({
+        req,
+        headers: Object.fromEntries(req.headers),
+      }),
+    });
+  }
+  return handler;
 }
 
 export async function POST(req: NextRequest) {
-  return handler(req);
+  const apolloHandler = await getApolloHandler();
+  return apolloHandler(req);
+}
+
+export async function GET(req: NextRequest) {
+  const apolloHandler = await getApolloHandler();
+  return apolloHandler(req);
 }
