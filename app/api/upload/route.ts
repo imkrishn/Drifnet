@@ -1,3 +1,6 @@
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
 import cloudinary from "@/lib/cloudinary";
 import { NextRequest, NextResponse } from "next/server";
 
