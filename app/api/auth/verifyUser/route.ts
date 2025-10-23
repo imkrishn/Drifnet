@@ -1,17 +1,18 @@
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
+export const preferredRegion = "auto";
 
-import { jwtVerify } from "jose";
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 
 export async function GET(req: NextRequest) {
   try {
+    const { jwtVerify } = await import("jose");
+    const { prisma } = await import("@/lib/prisma");
+
     //  Get token from cookie
     const token = req.cookies.get("drifnet_session")?.value;
     if (!token) return NextResponse.json({ valid: false });
 
-    // Access env variable safely at runtime
     const secret = process.env.JWT_SECRET;
     if (!secret) {
       console.error("Missing JWT_SECRET environment variable");
