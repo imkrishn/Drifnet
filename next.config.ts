@@ -9,6 +9,8 @@ const nextConfig = {
     serverActions: {
       bodySizeLimit: "2mb",
     },
+
+    serverComponentsExternalPackages: ["@apollo/server"],
   },
 
   runtime: "nodejs",
