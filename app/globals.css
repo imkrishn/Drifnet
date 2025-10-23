@@ -1,0 +1,122 @@
+@import "tailwindcss";
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+@layer base {
+  :root {
+    /* Background & Foreground */
+    --background: 0 0% 100%; /* White background */
+    --foreground: 14 0% 0%; /* Black text */
+
+    /* Cards */
+    --card: 0 0% 100%; /* Card background (white) */
+    --card-foreground: 14 0% 10%; /* Card text (very dark gray) */
+
+    /* Popovers / Modals */
+    --popover: 14 0% 95%; /* Light gray popover */
+    --popover-foreground: 14 95% 0%; /* Dark text on popover */
+
+    /* Primary actions */
+    --primary: 14 90% 48%; /* Strong reddish-orange */
+    --primary-loading: 14 90% 38%; /* Slightly darker for loading states */
+    --primary-foreground: 0 0% 100%; /* White text on primary buttons */
+
+    /* Secondary actions / text */
+    --secondary: 14 10% 70%; /* Medium-light gray */
+    --secondary-foreground: 0 0% 0%; /* Black text for secondary elements */
+
+    /* Muted / subtle background */
+    --muted: -24 10% 85%; /* Muted light beige/gray */
+    --muted-foreground: 14 0% 35%; /* Medium-dark gray text on muted bg */
+
+    /* Accent / highlights */
+    --accent: -24 10% 80%; /* Soft beige/peach gray for highlights */
+    --accent-foreground: 14 0% 10%; /* Dark text on accent */
+
+    /* Destructive / danger actions */
+    --destructive: 0 50% 30%; /* Dark red / warning */
+    --destructive-foreground: 14 0% 90%; /* Light text on destructive bg */
+
+    /* Sidebar / navigation */
+    --sidebar-background: 0 0% 96%; /* Light gray sidebar */
+    --sidebar-text: 220 9% 46%; /* Sidebar text */
+    --sidebar-hover: 220 26% 17%; /* Sidebar hover (dark gray) */
+
+    /* Borders / inputs / rings */
+    --border: 220 13% 91%; /* Light gray border */
+    --input: 14 20% 18%; /* Input background / dark gray */
+    --ring: 14 90% 48%; /* Primary ring color */
+
+    /* User-specific elements */
+    --user-designation: 14 0% 95%; /* User designation text color */
+    --comment-tag: 140 60% 88%; /* soft mint-green background */
+    --comment-tag-text: 145 50% 20%;
+
+    --radius: 1rem;
+    --shadow-soft: 0 4px 20px hsl(14 10% 90% / 0.2);
+    --shadow-strong: 0 6px 30px hsl(14 10% 40% / 0.25);
+  }
+
+  .dark {
+    /* Background & Foreground */
+    --background: 14 10% 5%; /* Dark background */
+    --foreground: 14 0% 90%; /* Light text */
+
+    /* Cards */
+    --card: 14 0% 0%; /* Dark card background */
+    --card-foreground: 14 0% 90%; /* Card text (light) */
+
+    /* Popovers / Modals */
+    --popover: 14 10% 5%; /* Dark popover */
+    --popover-foreground: 14 0% 90%; /* Light text on popover */
+
+    /* Primary actions */
+    --primary: 14 90% 48%; /* Strong reddish-orange */
+    --primary-foreground: 0 0% 0%; /* Black text on primary button */
+
+    /* Secondary actions / text */
+    --secondary: 14 10% 10%; /* Dark gray secondary elements */
+    --secondary-foreground: 0 0% 100%; /* White text on secondary elements */
+
+    /* Muted / subtle background */
+    --muted: -24 10% 15%; /* Dark muted background */
+    --muted-foreground: 14 0% 60%; /* Muted text (medium light) */
+
+    /* Accent / highlights */
+    --accent: -24 10% 15%; /* Dark accent */
+    --accent-foreground: 14 0% 90%; /* Light text on accent */
+
+    /* Destructive / danger actions */
+    --destructive: 0 50% 30%; /* Same dark red */
+    --destructive-foreground: 14 0% 90%; /* Light text on destructive */
+
+    /* Sidebar / navigation */
+    --sidebar-background: 0 0% 14%; /* Dark sidebar */
+    --sidebar-text: 220 9% 70%; /* Sidebar text */
+    --sidebar-hover: 220 9% 36%; /* Sidebar hover */
+
+    /* Borders / inputs / rings */
+    --border: 14 20% 18%; /* Dark border */
+    --input: 0 0% 100%; /* White input text */
+    --ring: 14 90% 48%; /* Primary ring */
+
+    /* User-specific elements */
+    --user-designation: 0 0% 95%; /* Light text for designation */
+    --comment-tag: 145 45% 25%; /* deep green background */
+    --comment-tag-text: 140 60% 80%; /* light mint text for contrast */
+
+    --shadow-soft: 0 4px 20px hsl(14 10% 10% / 0.4);
+    --shadow-strong: 0 6px 30px hsl(14 10% 5% / 0.6);
+  }
+}
+
+@layer base {
+  body {
+    /* Tailwind v4: arbitrary values reading CSS vars */
+    @apply bg-[hsl(var(--background))] text-[hsl(var(--foreground))];
+  }
+}

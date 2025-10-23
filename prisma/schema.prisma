@@ -1,0 +1,244 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                        String        @id @default(auto()) @map("_id") @db.ObjectId
+  name                      String
+  email                     String        @unique
+  isVerified                Boolean       @default(false)
+  password                  String?
+  imgUrl                    String        @default("https://res.cloudinary.com/dsjq0tmva/image/upload/c_fill,g_auto,w_600,h_600/v1758381730/posts/hohuznfkdbcs7pgku2da.png")
+  designation               String?
+  verificationToken         String?
+  verificationTokenTime     DateTime?
+  forgotVerificationToken   String?
+  forgotVerificationTokenTime DateTime?
+
+  // account
+  accountType               AccountType   @default(PUBLIC)
+
+  // Relations
+  sessions                  Session[]   
+  following                 Follows[]     @relation("FollowingRelation")
+  follower                  Follows[]     @relation("FollowerRelation")
+  posts                     Post[]
+  comments                  Comment[]
+  engagements               Engagement[]
+  reports                   Report[]
+  deletions                 IsDeleted[]
+  ownedCommunities          Community[]   @relation("CommunityOwner")
+  communityMemberships      CommunityMember[]
+
+  // Notification relations
+  notificationsSent         Notification[]   @relation("NotificationSender")
+  notificationsReceived     Notification[]   @relation("NotificationReceiver")
+
+  createdAt                 DateTime      @default(now())
+  updatedAt                 DateTime      @updatedAt
+}
+
+enum AccountType {
+  PUBLIC
+  PRIVATE
+}
+
+model Follows {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  followerId  String   @db.ObjectId
+  followingId String   @db.ObjectId
+
+  follower    User     @relation("FollowingRelation", fields: [followerId], references: [id])
+  following   User     @relation("FollowerRelation", fields: [followingId], references: [id])
+
+  createdAt   DateTime @default(now())
+
+  @@unique([followerId, followingId]) // Prevent duplicate follows
+}
+
+model Session {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  jti         String    @unique 
+  deviceId    String
+  userAgent   String?
+  ipAddress   String?
+  token       String
+
+  userId      String    @db.ObjectId
+  user        User      @relation(fields: [userId], references: [id])
+
+  createdAt   DateTime  @default(now())
+  expiresAt   DateTime
+}
+
+model Community {
+  id          String            @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String?
+  imgUrl      String?
+  bannerUrl   String?
+  ownerId     String            @db.ObjectId
+  owner       User              @relation("CommunityOwner", fields: [ownerId], references: [id])
+  posts       Post[]            @relation("CommunityPosts")
+  members     CommunityMember[]
+   notifications Notification[]    @relation("CommunityNotifications")
+  communityType               AccountType   @default(PUBLIC)
+
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+}
+
+model CommunityMember {
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String     @db.ObjectId
+  communityId String     @db.ObjectId
+  user        User       @relation(fields: [userId], references: [id])
+  community   Community  @relation(fields: [communityId], references: [id])
+  joinedAt    DateTime   @default(now())
+  lastActive  DateTime? 
+  
+  @@unique([userId,communityId])
+}
+
+model Post {
+  id           String     @id @default(auto()) @map("_id") @db.ObjectId
+  title        String
+  body         String
+  imgUrls      String[]
+  isDeleted    Boolean    @default(false)
+
+  userId       String     @db.ObjectId
+  user         User       @relation(fields: [userId], references: [id])
+
+  communityId  String?    @db.ObjectId
+  community    Community? @relation("CommunityPosts", fields: [communityId], references: [id])
+
+  comments     Comment[]
+  engagements  Engagement[]
+  reports      Report[]
+  deletions    IsDeleted[]
+
+  // notifications for this post
+  notifications Notification[] @relation("PostNotifications")
+
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
+
+model Comment {
+  id              String     @id @default(auto()) @map("_id") @db.ObjectId
+  content         String
+
+  userId          String     @db.ObjectId
+  user            User       @relation(fields: [userId], references: [id])
+
+  postId          String     @db.ObjectId
+  post            Post       @relation(fields: [postId], references: [id])
+
+  parentCommentId String?    @db.ObjectId
+  parentComment   Comment?   @relation("CommentReplies", fields: [parentCommentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  replies         Comment[]  @relation("CommentReplies")
+
+  engagements     Engagement[]
+  reports         Report[]
+  deletions       IsDeleted[]
+
+  notifications   Notification[] @relation("CommentNotifications")
+
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+}
+
+model Engagement {
+  id        String          @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String          @db.ObjectId
+  user      User            @relation(fields: [userId], references: [id])
+
+  postId    String?         @db.ObjectId
+  post      Post?           @relation(fields: [postId], references: [id])
+
+  commentId String?         @db.ObjectId
+  comment   Comment?        @relation(fields: [commentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  type      EngagementType
+
+  createdAt DateTime        @default(now())
+}
+
+model Report {
+  id        String     @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String     @db.ObjectId
+  user      User       @relation(fields: [userId], references: [id])
+
+  postId    String?    @db.ObjectId
+  post      Post?      @relation(fields: [postId], references: [id])
+
+  commentId String?    @db.ObjectId
+  comment   Comment?   @relation(fields: [commentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  reason    String?
+
+  createdAt DateTime   @default(now())
+}
+
+model IsDeleted {
+  id        String     @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String     @db.ObjectId
+  user      User       @relation(fields: [userId], references: [id])
+
+  postId    String?    @db.ObjectId
+  post      Post?      @relation(fields: [postId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  commentId String?    @db.ObjectId
+  comment   Comment?   @relation(fields: [commentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  deletedAt DateTime   @default(now())
+}
+
+enum EngagementType {
+  LIKE
+  DISLIKE
+}
+
+model Notification {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  type        NotificationType
+  senderId    String   @db.ObjectId
+  receiverId  String   @db.ObjectId
+  postId      String?  @db.ObjectId
+  communityId String?  @db.ObjectId
+  commentId   String?  @db.ObjectId
+  status      NotificationStatus @default(UNREAD)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  sender      User     @relation("NotificationSender", fields: [senderId], references: [id])
+  receiver    User     @relation("NotificationReceiver", fields: [receiverId], references: [id])
+  
+
+  post        Post?      @relation("PostNotifications", fields: [postId], references: [id])
+  community   Community? @relation("CommunityNotifications", fields: [communityId], references: [id])
+  comment     Comment?   @relation("CommentNotifications", fields: [commentId], references: [id])
+}
+
+enum NotificationType {
+  FOLLOW_REQUEST   // someone sent a follow request
+  FOLLOWED         // someone followed
+  JOIN_REQUEST_COMMUNITY     //someone sent a community request to joined
+  JOINED_COMMUNITY        //someone joined community           
+  LIKE_POST        // someone liked my post
+  COMMENT_POST     // someone commented on my post
+  PROFILE_VIEW     // someone viewed my profile
+  REPORT           // someone reported my post/comment
+}
+
+enum NotificationStatus {
+  UNREAD
+  READ
+}
