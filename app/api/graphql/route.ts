@@ -1,10 +1,12 @@
 import { NextRequest } from "next/server";
-import { schema } from "@/graphql/schema";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+export const preferredRegion = "auto";
 
-let handler: any = null;
+let handler: ReturnType<
+  typeof import("@as-integrations/next").startServerAndCreateNextHandler
+> | null = null;
 
 async function getApolloHandler() {
   if (!handler) {
@@ -12,18 +14,22 @@ async function getApolloHandler() {
     const { startServerAndCreateNextHandler } = await import(
       "@as-integrations/next"
     );
+    const { schema } = await import("@/graphql/schema");
 
     const server = new ApolloServer({
       schema,
+      introspection: process.env.NODE_ENV !== "production",
     });
 
     handler = startServerAndCreateNextHandler<NextRequest>(server, {
-      context: async (req) => ({
-        req,
-        headers: Object.fromEntries(req.headers),
-      }),
+      context: async (req) => {
+        const headers = Object.fromEntries(req.headers);
+
+        return { req, headers };
+      },
     });
   }
+
   return handler;
 }
 
