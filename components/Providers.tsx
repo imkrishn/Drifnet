@@ -23,7 +23,7 @@ const Providers = ({ children }: { children: React.ReactNode }) => {
         <ThemeProvider
           attribute="class"
           defaultTheme="light"
-          enableSystem
+          enableSystem={false}
           disableTransitionOnChange
         >
           <Toaster richColors position="top-center" />

@@ -9,8 +9,11 @@ const sidebarCollapseSlice = createSlice({
     toggleSidebar: (state) => {
       state.isCollapsed = !state.isCollapsed;
     },
+    setCollapsed: (state, action) => {
+      state.isCollapsed = action.payload;
+    },
   },
 });
 
-export const { toggleSidebar } = sidebarCollapseSlice.actions;
+export const { toggleSidebar, setCollapsed } = sidebarCollapseSlice.actions;
 export default sidebarCollapseSlice.reducer;

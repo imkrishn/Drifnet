@@ -1,4 +1,3 @@
-import React from "react";
 import Trending from "@/components/Trending";
 
 const Main = () => {

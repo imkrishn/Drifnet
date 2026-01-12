@@ -14,6 +14,11 @@ import { useQuery } from "@apollo/client/react";
 import { Community } from "@/types/postType";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { set } from "zod";
+import {
+  setCollapsed,
+  toggleSidebar,
+} from "@/redux/slices/sidebarCollapseSlice";
 
 const TOP_COMMUNITIES = gql`
   query GetNotifications($loggedInUserId: String!) {
@@ -65,6 +70,14 @@ const Main = ({ children }: { children: React.ReactNode }) => {
 
     getLoggedInUser();
   }, []);
+
+  //resize for mobile view
+
+  useEffect(() => {
+    if (window.innerWidth < 768) {
+      dispatch(setCollapsed(true));
+    }
+  }, [dispatch]);
 
   const { data: topCommunities } = useQuery<{
     getTopCommunities: { success: boolean; communities: Community[] };
