@@ -42,3 +42,5 @@ Drifnet is a **modern community based content platform ** built to enable seamle
 ### Authentication
 
 - JWT-based authentication
+
+Live Link - https://drifnet-kk.vercel.app
