@@ -1,5 +1,7 @@
+import CommunityCard from "@/components/CommunityCard";
 import Home from "@/components/Home";
 import ProfileCard from "@/components/Profile";
+import React from "react";
 
 const Page = async ({ params }: { params: any }) => {
   const paramValue = await params;
@@ -11,6 +13,12 @@ const Page = async ({ params }: { params: any }) => {
       {menuRoutes[0] === "view" && (
         <div className="min-h-screen  flex items-center justify-end lg:mx-14 ">
           <ProfileCard />
+        </div>
+      )}
+
+      {menuRoutes[0] === "community" && (
+        <div className="min-h-screen  flex items-center justify-end lg:mx-14 ">
+          <CommunityCard />
         </div>
       )}
     </div>
